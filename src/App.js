@@ -26,6 +26,25 @@ function App(){
   setTodoDate('');
  };
 
+ // toggle todo completion 
+ const toggleTodo= (id)=>{
+  setTodos(todos.map(todo =>
+    todo.id ===id ? {...todo, completed: !todo.completed} : todo
+  ));
+ }
+ 
+ //delete todo
+ const deleteTodo=(id)=>{
+  setTodos(todos.filter(todo => todo.id !== id));
+ }
+
+ // handle Enter key press in input
+  const handleKeyPress=(e)=>{
+    if(e.key==='Enter'){
+      addTodo();
+    }
+  }
+
  return (
   <div className="App">
     <header className="App-header">
@@ -37,6 +56,7 @@ function App(){
        type="text"
        value={todoText}
        onChange={(e)=>setTodoText(e.target.value)}
+       onKeyPress={handleKeyPress}
        placeholder="What needs to be done ?"
        className="todo-input"
      />
@@ -66,17 +86,56 @@ function App(){
     {/* Todo List Display */}
     <div className="todo-list">
       {todos.length ===0 ?(
-        <p>No todos yet. Add one above !</p>
+        <p className="empty-message">No todos yet. Add one above !</p>
       ): (
         todos.map(todo =>(
-          <div key={todo.id} className="todo-item">
+          <div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+          <input
+            type="checkbox"
+            checked={todo.completed}
+            onChange={() => toggleTodo(todo.id)}
+            className="todo-checkbox"
+          />
+
+          <div className="todo-content">
+          <span className="todo-text">{todo.text}</span>
+          <div clasName="todo-meta">
+          <span className={`category-badge category-${todo.category}`}>{todo.category}</span>
+
           <span> {todo.text}</span>
           <span className="category-badge">{todo.category}</span>
           <span className="category-date">{todo.date}</span>
+          {todo.date && (
+            <span className="todo-date">Due: {todo.date}</span>
+          )}
+          </div>
+          </div>
+
+          <button
+            onClick={ ()=> deleteTodo (todo.id)}
+            className="delelte-button"
+            arial-label="delete todo"
+            >
+              X
+            </button>
+          ){'}'}
           </div>
         ))
-      )}
+    )}  
     </div>
+
+    {/* Todo Stats */}
+    {todos.length > 0 && (
+      <div className="todo-stats">
+        <p>
+          Total Todos: {todos.length} |
+          completed :{todos.filter(todo=> todo.completed).length} |
+          Remaining: {todos.filter(todo =>!todo.completed).length}
+        
+        </p>
+        </div>
+        )}
+
     </header>
   </div>
  );
