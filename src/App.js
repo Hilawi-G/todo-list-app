@@ -1,145 +1,191 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { FaTrash, FaCalendarAlt, FaTag } from 'react-icons/fa';
 import './App.css';
 
-function App(){
-  // state for todos array and input fields
-  const [todos,setTodos]= useState([]);
-  const [todoText, setTodoText]= useState('');
-  const [todoCategory, setTodoCategory]= useState('personal');
-  const [todoDate, setTodoDate]=useState('');
+function App() {
+  const [todos, setTodos] = useState([]);
+  const [todoText, setTodoText] = useState('');
+  const [todoCategory, setTodoCategory] = useState('personal');
+  const [todoDate, setTodoDate] = useState('');
+  const [filter, setFilter] = useState('all');
 
- // add new todo function
- const addTodo= ()=>{
-  if(todoText.trim()==='')return;
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true;
+  });
 
-  const newTodo={
-    id:Date.now(),
-    text:todoText,
-    category:todoCategory,
-    date:todoDate,
-    completed:false,
-    createdAt:new Date().toISOString()
+  const addTodo = () => {
+    if (todoText.trim() === '') return;
+    
+    const newTodo = {
+      id: Date.now(),
+      text: todoText,
+      category: todoCategory,
+      date: todoDate,
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
+    
+    setTodos([...todos, newTodo]);
+    setTodoText('');
+    setTodoDate('');
   };
 
-  setTodos([...todos,newTodo]);
-  setTodoText('');
-  setTodoDate('');
- };
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
 
- // toggle todo completion 
- const toggleTodo= (id)=>{
-  setTodos(todos.map(todo =>
-    todo.id ===id ? {...todo, completed: !todo.completed} : todo
-  ));
- }
- 
- //delete todo
- const deleteTodo=(id)=>{
-  setTodos(todos.filter(todo => todo.id !== id));
- }
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
 
- // handle Enter key press in input
-  const handleKeyPress=(e)=>{
-    if(e.key==='Enter'){
-      addTodo();
-    }
-  }
+  const clearCompleted = () => {
+    setTodos(todos.filter(todo => !todo.completed));
+  };
 
- return (
-  <div className="App">
-    <header className="App-header">
-      <h1>My Todo List</h1>
-
-      {/* Todo Input Form*/}
-    <div className="todo-form">
-     <input
-       type="text"
-       value={todoText}
-       onChange={(e)=>setTodoText(e.target.value)}
-       onKeyPress={handleKeyPress}
-       placeholder="What needs to be done ?"
-       className="todo-input"
-     />
-
-      <select
-        value={todoCategory}
-        onChange={(e)=>setTodoCategory(e.target.value)}
-        className="category-select"
-      >
-        <option value="personal">Personal</option>
-        <option value="work">Work</option>
-        <option value="shopping">Shopping</option>
-        <option value="health">Health</option>
-      </select>
-
-      <input
-        type="date"
-        value={todoDate}
-        onChange= {(e)=> setTodoDate(e.target.value)}
-        className="date-input"
-      />
-      <button onClick={addTodo} className="add-button" >
-        Add Todo
-      </button>
-    </div>
-
-    {/* Todo List Display */}
-    <div className="todo-list">
-      {todos.length ===0 ?(
-        <p className="empty-message">No todos yet. Add one above !</p>
-      ): (
-        todos.map(todo =>(
-          <div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-          <input
-            type="checkbox"
-            checked={todo.completed}
-            onChange={() => toggleTodo(todo.id)}
-            className="todo-checkbox"
-          />
-
-          <div className="todo-content">
-          <span className="todo-text">{todo.text}</span>
-          <div clasName="todo-meta">
-          <span className={`category-badge category-${todo.category}`}>{todo.category}</span>
-
-          <span> {todo.text}</span>
-          <span className="category-badge">{todo.category}</span>
-          <span className="category-date">{todo.date}</span>
-          {todo.date && (
-            <span className="todo-date">Due: {todo.date}</span>
-          )}
-          </div>
-          </div>
-
-          <button
-            onClick={ ()=> deleteTodo (todo.id)}
-            className="delelte-button"
-            arial-label="delete todo"
-            >
-              X
-            </button>
-          ){'}'}
-          </div>
-        ))
-    )}  
-    </div>
-
-    {/* Todo Stats */}
-    {todos.length > 0 && (
-      <div className="todo-stats">
-        <p>
-          Total Todos: {todos.length} |
-          completed :{todos.filter(todo=> todo.completed).length} |
-          Remaining: {todos.filter(todo =>!todo.completed).length}
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>My Todo List</h1>
         
-        </p>
+        {/* Todo Input Form */}
+        <div className="todo-form">
+          <input
+            type="text"
+            value={todoText}
+            onChange={(e) => setTodoText(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+            placeholder="What needs to be done?"
+            className="todo-input"
+          />
+          
+          <select 
+            value={todoCategory} 
+            onChange={(e) => setTodoCategory(e.target.value)}
+            className="category-select"
+          >
+            <option value="personal">Personal</option>
+            <option value="work">Work</option>
+            <option value="shopping">Shopping</option>
+            <option value="health">Health</option>
+          </select>
+          
+          <input
+            type="date"
+            value={todoDate}
+            onChange={(e) => setTodoDate(e.target.value)}
+            className="date-input"
+          />
+          
+          <button onClick={addTodo} className="add-button">
+            Add Todo
+          </button>
         </div>
-        )}
 
-    </header>
-  </div>
- );
- 
+        {/* Filter Buttons */}
+        <div className="filter-buttons">
+          <button 
+            className={filter === 'all' ? 'filter-btn active' : 'filter-btn'}
+            onClick={() => setFilter('all')}
+          >
+            All
+          </button>
+          <button 
+            className={filter === 'active' ? 'filter-btn active' : 'filter-btn'}
+            onClick={() => setFilter('active')}
+          >
+            Active
+          </button>
+          <button 
+            className={filter === 'completed' ? 'filter-btn active' : 'filter-btn'}
+            onClick={() => setFilter('completed')}
+          >
+            Completed
+          </button>
+        </div>
+        
+        {/* Todo List */}
+        <div className="todo-list">
+          {filteredTodos.length === 0 ? (
+            <p className="empty-message">
+              {filter === 'all' 
+                ? 'No todos yet. Add one above!' 
+                : `No ${filter} todos!`
+              }
+            </p>
+          ) : (
+            filteredTodos.map(todo => (
+              <div key={todo.id} className={`todo-card ${todo.completed ? 'completed' : ''}`}>
+                <div className="card-header">
+                  <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => toggleTodo(todo.id)}
+                    className="todo-checkbox"
+                  />
+                  <span className="todo-text">{todo.text}</span>
+                  <button 
+                    onClick={() => deleteTodo(todo.id)}
+                    className="delete-btn"
+                    aria-label="Delete todo"
+                  >
+                    <FaTrash className="trash-icon" />
+                  </button>
+                </div>
+                
+                <div className="card-footer">
+                  <div className="todo-meta">
+                    <span className={`category-badge category-${todo.category}`}>
+                      <FaTag className="meta-icon" />
+                      {todo.category}
+                    </span>
+                    {todo.date && (
+                      <span className="todo-date">
+                        <FaCalendarAlt className="meta-icon" />
+                        Due: {todo.date}
+                      </span>
+                    )}
+                    <span className="created-date">
+                      Added: {new Date(todo.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Todo Stats & Clear Button */}
+        {todos.length > 0 && (
+          <div className="todo-stats-container">
+            <div className="todo-stats">
+              <p>
+                <span className="stat-item">Total: {todos.length}</span>
+                <span className="stat-item">Completed: {todos.filter(todo => todo.completed).length}</span>
+                <span className="stat-item">Remaining: {todos.filter(todo => !todo.completed).length}</span>
+                {filter !== 'all' && (
+                  <span className="stat-item">Showing: {filter} ({filteredTodos.length})</span>
+                )}
+              </p>
+            </div>
+            
+            {/* Clear Completed Button */}
+            {todos.filter(todo => todo.completed).length > 0 && (
+              <button 
+                onClick={clearCompleted}
+                className="clear-completed-btn"
+              >
+                Clear Completed
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+    </div>
+  );
 }
 
 export default App;
