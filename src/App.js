@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { FaTrash, FaCalendarAlt, FaTag } from 'react-icons/fa';
 import './App.css';
 
@@ -8,6 +8,11 @@ function App() {
   const [todoCategory, setTodoCategory] = useState('personal');
   const [todoDate, setTodoDate] = useState('');
   const [filter, setFilter] = useState('all');
+
+  useEffect (() =>{
+    const remaining= todos.filter(todo => !todo.compelted).length;
+    document.title =remaining >0 ? `(${remaining}) FLOWORK` : 'FLOWORK';
+  }, [todos]); 
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
@@ -49,7 +54,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>My Todo List</h1>
+        <h1>FLOWORK</h1>
         
         {/* Todo Input Form */}
         <div className="todo-form">
