@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTrash, FaCalendarAlt, FaTag } from 'react-icons/fa';
 import './App.css';
 
@@ -9,10 +9,11 @@ function App() {
   const [todoDate, setTodoDate] = useState('');
   const [filter, setFilter] = useState('all');
 
-  useEffect (() =>{
-    const remaining= todos.filter(todo => !todo.compelted).length;
-    document.title =remaining >0 ? `(${remaining}) FLOWORK` : 'FLOWORK';
-  }, [todos]); 
+  // Tab title counter with fixed typo
+  useEffect(() => {
+    const remaining = todos.filter(todo => !todo.completed).length; // Fixed: completed
+    document.title = remaining > 0 ? `(${remaining}) FLOWORK` : 'FLOWORK';
+  }, [todos]);
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
@@ -115,12 +116,21 @@ function App() {
         {/* Todo List */}
         <div className="todo-list">
           {filteredTodos.length === 0 ? (
-            <p className="empty-message">
-              {filter === 'all' 
-                ? 'No todos yet. Add one above!' 
-                : `No ${filter} todos!`
-              }
-            </p>
+            <div className="empty-state">
+              <div className="empty-illustration">📝</div>
+              <h3>
+                {filter === 'all' 
+                  ? 'No todos yet!' 
+                  : `No ${filter} todos!`
+                }
+              </h3>
+              <p>
+                {filter === 'all' 
+                  ? 'Add your first task to get started!' 
+                  : 'Try switching to a different filter'
+                }
+              </p>
+            </div>
           ) : (
             filteredTodos.map(todo => (
               <div key={todo.id} className={`todo-card ${todo.completed ? 'completed' : ''}`}>
